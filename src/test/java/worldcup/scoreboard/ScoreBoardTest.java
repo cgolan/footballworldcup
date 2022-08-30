@@ -1,8 +1,12 @@
 package src.test.java.worldcup.scoreboard;
 
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import src.main.java.worldcup.model.Match;
+import src.main.java.worldcup.scoreboard.ScoreBoard;
+import src.main.java.worldcup.scoreboard.ScoreBoardImpl;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -18,7 +22,7 @@ public class ScoreBoardTest {
         List<Match> matchList = scoreBoard.summary();
 
         //Then
-        assertFalse(matchList.isEmpty);
+        assertFalse(matchList.isEmpty());
     }
 
     @Test
@@ -32,7 +36,19 @@ public class ScoreBoardTest {
 
         //Then
         List<Match> matchList = scoreBoard.summary();
-        assertTrue(matchList.isEmpty);
+        assertTrue(matchList.isEmpty());
+    }
+
+    @Test
+    void should_not_finish_any_game_in_progress_when_game_not_found_and_a_warning_should_be_logged(){
+        //Given
+        ScoreBoard scoreBoard = new ScoreBoardImpl();
+
+        //When
+        Match match = scoreBoard.endGame("randomId");
+
+        //Then
+        assertNull(match);
     }
 
     @Test
@@ -49,7 +65,7 @@ public class ScoreBoardTest {
 
         //Then
         List<Match> matchList = scoreBoard.summary();
-        assertFalse(matchList.isEmpty);
+        assertFalse(matchList.isEmpty());
         assertNotSame(awayTeamOldScore,awayTeamNewScore);
     }
 
@@ -58,11 +74,11 @@ public class ScoreBoardTest {
         //Given
         ScoreBoard scoreBoard = new ScoreBoardImpl();
 
-        Match mexicoVsCanada = scoreBoard.newGame("Mexico", "Canada");
-        Match spainVsBrazil = scoreBoard.newGame("Spain", "Brazil");
-        Match germanyVsFrance = scoreBoard.newGame("Germany", "France");
-        Match uruguayVsItaly = scoreBoard.newGame("Uruguay", "Italy", 10);
-        Match argentinaVsFrance = scoreBoard.newGame("Argentina", "Australia");
+        Match mexicoVsCanada = scoreBoard.startNewGame("Mexico", "Canada");
+        Match spainVsBrazil = scoreBoard.startNewGame("Spain", "Brazil");
+        Match germanyVsFrance = scoreBoard.startNewGame("Germany", "France");
+        Match uruguayVsItaly = scoreBoard.startNewGame("Uruguay", "Italy", 10);
+        Match argentinaVsFrance = scoreBoard.startNewGame("Argentina", "Australia");
 
         scoreBoard.updateScore(mexicoVsCanada.getMatchId(), 0, 5);
         scoreBoard.updateScore(spainVsBrazil.getMatchId(), 10, 2);
@@ -72,8 +88,8 @@ public class ScoreBoardTest {
 
         //When
         List<Match> matchList = scoreBoard.summary();
-        assertFalse(matchList.isEmpty);
-        assertEquals(matchList.get(0).getMatchId, uruguayVsItaly.getMatchId());
+        assertFalse(matchList.isEmpty());
+        assertEquals(matchList.get(0).getMatchId(), uruguayVsItaly.getMatchId());
 
     }
 }
